@@ -1,11 +1,26 @@
 const express = require('express')
 require('dotenv').config()
 const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
+
+const UserModel = require("./models/User")
 
 const app = express()
+app.use(bodyParser.json())
 
-app.get("/", (req, res)=>{
-    req.send("Working...")
+app.get("/", async(req, res)=>{
+    let data = await UserModel.find();
+    res.send(data)
+})
+
+app.post("/post", async(req, res)=>{
+  let body = req.body;
+  try{
+    let value = await UserModel.insertMany(body);
+    res.status(201).send({message: "data created", value})
+  }catch(err){
+    console.error(err)
+  }
 })
 
 mongoose.connect(process.env.URI, {
