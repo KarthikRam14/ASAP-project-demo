@@ -15,9 +15,36 @@ app.get("/", async(req, res)=>{
 
 app.post("/post", async(req, res)=>{
   let body = req.body;
+  let data = await UserModel.findOne({email: body.email})
+  if(data){
+    return res.status(400).send({message: "user already exists"})
+  }else{
+    console.log(data, "user not there")
+  }
   try{
     let value = await UserModel.insertMany(body);
     res.status(201).send({message: "data created", value})
+  }catch(err){
+    console.error(err)
+  }
+})
+
+app.patch("/update/:id", async(req, res)=>{
+  let body = req.body
+  let id = req.params.id
+  try{
+    let value = await UserModel.findByIdAndUpdate(id, body, {new: true})
+    res.status(201).send({message: "data updated", value})
+  }catch(err){
+    console.error(err)
+  }
+})
+
+app.delete("/delete/:id", async(req, res)=>{
+  try{
+    let id = req.params.id
+    let data = await UserModel.findByIdAndDelete(id)
+    res.status(201).send({message: "data deleted", data})
   }catch(err){
     console.error(err)
   }
